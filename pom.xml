@@ -14,7 +14,8 @@
         <module>coconut-command</module>
         <module>coconut-json</module>
         <module>coconut-converter</module>
-    <module>coconut-query</module>
+        <module>coconut-query</module>
+    <module>coconut-incubator</module>
   </modules>
 
     <properties>
