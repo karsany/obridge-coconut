@@ -14,7 +14,7 @@ import java.util.Map;
 
 public final class JsonObject {
 
-    private static <T> T create(Class<T> clazz, JSONObject jo) throws ConverterNotFoundException {
+    private static <T extends JsonString> T create(Class<T> clazz, JSONObject jo) throws ConverterNotFoundException {
 
         Map<String, Object> methodResultMap = new HashMap<>();
 
@@ -49,15 +49,15 @@ public final class JsonObject {
 
                     final Object o = jo.get(jsonKey);
 
-                    if (o.getClass()
-                            .equals(method.getReturnType())) {
+                    if (o.getClass().equals(method.getReturnType())) {
+
                         methodResultMap.put(method.getName(), o);
-                    } else if (o.getClass()
-                            .equals(JSONObject.class)) {
-                        methodResultMap.put(method.getName(),
-                                JsonObject.create(method.getReturnType(), (JSONObject) o));
-                    } else if (o.getClass()
-                            .equals(JSONArray.class)) {
+
+                    } else if (o.getClass().equals(JSONObject.class)) {
+
+                        methodResultMap.put(method.getName(), JsonObject.create((Class<T>) method.getReturnType(), (JSONObject) o));
+
+                    } else if (o.getClass().equals(JSONArray.class)) {
 
                         final Type genericReturnType = method.getGenericReturnType();
                         Class c = (Class<?>) ((ParameterizedType) genericReturnType).getActualTypeArguments()[0];
@@ -90,13 +90,17 @@ public final class JsonObject {
                     public Object invoke(Object proxy, Method method, Object[] args)
                             throws Throwable {
 
-                        return methodResultMap.get(method.getName());
+                        if (method.getName().equals("toJson")) {
+                            return jo.toString(2);
+                        } else {
+                            return methodResultMap.get(method.getName());
+                        }
                     }
                 });
 
     }
 
-    public static <T> T create(Class<T> clazz, String jsonString) throws ConverterNotFoundException {
+    public static <T extends JsonString> T create(Class<T> clazz, String jsonString) throws ConverterNotFoundException {
         JSONObject jo = new JSONObject(jsonString);
         return create(clazz, jo);
     }

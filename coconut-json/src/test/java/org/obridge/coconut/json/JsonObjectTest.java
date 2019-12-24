@@ -60,7 +60,7 @@ public class JsonObjectTest {
 
     }
 
-    public interface Teszt {
+    public interface Teszt extends JsonString {
 
         String teszt();
 
@@ -76,7 +76,7 @@ public class JsonObjectTest {
 
     }
 
-    public interface Person {
+    public interface Person extends JsonString {
 
         String name();
 
