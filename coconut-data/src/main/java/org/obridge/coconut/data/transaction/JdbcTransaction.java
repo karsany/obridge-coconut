@@ -48,7 +48,6 @@ public class JdbcTransaction implements Transaction {
     public void commit() {
         try {
             this.connection.commit();
-            this.connection.close();
         } catch (SQLException e) {
             this.rollback();
             throw new JdbcTransactionException(e);
