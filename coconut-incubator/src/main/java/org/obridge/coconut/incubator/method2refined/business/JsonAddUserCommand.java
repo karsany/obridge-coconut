@@ -1,4 +1,4 @@
-package org.obridge.coconut.incubator.method2refined;
+package org.obridge.coconut.incubator.method2refined.business;
 
 import org.json.JSONObject;
 

@@ -28,6 +28,11 @@ package org.obridge.coconut.data.jdbc;
  * Created by fkarsany on 2015.03.23..
  */
 public class JdbcTemplateException extends RuntimeException {
+
+    public JdbcTemplateException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
     public JdbcTemplateException(Throwable cause) {
         super(cause);
     }

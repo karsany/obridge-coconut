@@ -1,9 +1,9 @@
 package org.obridge.coconut.query;
 
+import org.obridge.coconut.data.jdbc.NamedParameterStatement;
 import org.obridge.coconut.query.annotation.Bind;
 import org.obridge.coconut.query.annotation.QuerySource;
 import org.obridge.coconut.query.query.ResourceFileQuery;
-import org.obridge.coconut.query.util.NamedParameterStatement;
 
 import javax.sql.DataSource;
 import java.lang.reflect.*;

@@ -1,10 +1,16 @@
-package org.obridge.coconut.incubator.method2refined;
+package org.obridge.coconut.incubator.method2refined.business;
 
 
 import oracle.jdbc.pool.OracleDataSource;
+import org.obridge.coconut.data.session.DatabaseSession;
+import org.obridge.coconut.data.transaction.JdbcTransaction;
+import org.obridge.coconut.data.transaction.Transaction;
+import org.obridge.coconut.data.transaction.TransactionChain;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Test {
 
@@ -21,8 +27,11 @@ public class Test {
 
         trx.apply(audbc);
 
-        Collection<String> x = trx.ret(dbConnection -> {
-            return dbConnection.query("select distinct name from users", (resultSet, i) -> resultSet.getString(1));
+        Collection<String> x = trx.apply(new Function<DatabaseSession, Collection<String>>() {
+            @Override
+            public Collection<String> apply(DatabaseSession databaseSession) {
+                return databaseSession.query("select distinct name from users", (resultSet, i) -> resultSet.getString(1));
+            }
         });
 
         System.out.println(x);
@@ -46,7 +55,7 @@ public class Test {
 
 
         tc
-                .apply(dbConnection -> audbc.run(dbConnection))
+                .transact(new AddUserDbCommand(auc))
                 .get(
                         dbConnection ->
                                 dbConnection
@@ -59,9 +68,14 @@ public class Test {
                                         .findFirst()
                                         .get()
                 )
-                .callback(s -> System.out.println(s))
-                .putAndGet((dbConnection, s) -> dbConnection.query("select count(1) from users where name = ?", (resultSet, i) -> resultSet.getInt(1), s).stream().findFirst().get())
-                .callback(integer -> System.out.println(integer))
+                .process(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) {
+                        System.out.println(s);
+                    }
+                })
+                .get((dbConnection, s) -> dbConnection.query("select count(1) from users where name = ?", (resultSet, i) -> resultSet.getInt(1), s).stream().findFirst().get())
+                .process(integer -> System.out.println(integer))
                 .rollback();
 
     }

@@ -10,7 +10,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package org.obridge.coconut.query.util;
+package org.obridge.coconut.data.jdbc;
 
 import java.sql.*;
 import java.util.HashMap;

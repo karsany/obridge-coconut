@@ -1,11 +1,11 @@
-package org.obridge.coconut.incubator.method2refined;
+package org.obridge.coconut.data.session;
 
 import org.obridge.coconut.data.jdbc.RowMapper;
 
 import java.util.Collection;
 import java.util.Map;
 
-public interface DBConnection {
+public interface DatabaseSession {
 
     void execute(String sql, Object... parameters);
 

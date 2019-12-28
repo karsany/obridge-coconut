@@ -1,7 +1,7 @@
-package org.obridge.coconut.incubator.method2refined;
+package org.obridge.coconut.data.session;
 
+import org.obridge.coconut.data.jdbc.NamedParameterStatement;
 import org.obridge.coconut.data.jdbc.RowMapper;
-import org.obridge.coconut.query.util.NamedParameterStatement;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,10 +12,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class JdbcConnection implements DBConnection {
+public class JdbcDatabaseSession implements DatabaseSession {
     private final Connection connection;
 
-    public JdbcConnection(Connection connection) {
+    public JdbcDatabaseSession(Connection connection) {
         this.connection = connection;
     }
 
@@ -27,7 +27,7 @@ public class JdbcConnection implements DBConnection {
             ps.execute();
             ps.close();
         } catch (SQLException e) {
-            throw new DBConnectionException(e);
+            throw new JdbcDatabaseSessionException(e);
         }
     }
 
@@ -43,7 +43,7 @@ public class JdbcConnection implements DBConnection {
             nps.execute();
             nps.close();
         } catch (SQLException e) {
-            throw new DBConnectionException(e);
+            throw new JdbcDatabaseSessionException(e);
         }
     }
 
@@ -55,7 +55,7 @@ public class JdbcConnection implements DBConnection {
             ResultSet resultSet = ps.executeQuery();
             return fetchData(rowMapper, resultSet);
         } catch (SQLException e) {
-            throw new DBConnectionException(e);
+            throw new JdbcDatabaseSessionException(e);
         }
     }
 
@@ -71,7 +71,7 @@ public class JdbcConnection implements DBConnection {
             final ResultSet resultSet = nps.executeQuery();
             return fetchData(rowMapper, resultSet);
         } catch (SQLException e) {
-            throw new DBConnectionException(e);
+            throw new JdbcDatabaseSessionException(e);
         }
     }
 

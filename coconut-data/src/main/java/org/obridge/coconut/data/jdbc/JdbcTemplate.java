@@ -24,6 +24,7 @@
 
 package org.obridge.coconut.data.jdbc;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,15 +37,10 @@ import java.util.List;
  */
 public class JdbcTemplate {
 
-    private final Connection connection;
+    private final DataSource dataSource;
 
-    public JdbcTemplate(Connection connection) {
-        this.connection = connection;
-        try {
-            this.connection.setAutoCommit(false);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public JdbcTemplate(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public <T> List<T> queryForList(String sql) {
@@ -62,10 +58,12 @@ public class JdbcTemplate {
     public <T> List<T> query(String sql, Object[] args, RowMapper<T> rowMapper) {
 
         List<T> ret = null;
+        Connection connection = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
 
         try {
+            connection = dataSource.getConnection();
             ps = connection.prepareStatement(sql);
 
             bindParameters(args, ps);
@@ -85,18 +83,20 @@ public class JdbcTemplate {
     }
 
     public void execute(String sql, Object... args) {
+        Connection connection = null;
         PreparedStatement ps = null;
 
         try {
+            connection = dataSource.getConnection();
             ps = connection.prepareStatement(sql);
 
             bindParameters(args, ps);
 
             ps.execute();
-            System.out.println("OK");
 
             ps.close();
             ps = null;
+            connection.close();
 
         } catch (SQLException e) {
             tryCloseConnection(connection, ps, null);
@@ -112,8 +112,9 @@ public class JdbcTemplate {
             if (ps != null && !ps.isClosed()) {
                 ps.close();
             }
-
-            this.connection.rollback();
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
 
         } catch (SQLException ex) {
             throw new JdbcTemplateException(ex);

@@ -1,10 +1,12 @@
-package org.obridge.coconut.incubator.method2refined;
+package org.obridge.coconut.data.transaction;
+
+import org.obridge.coconut.data.session.DatabaseSession;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class GenericTransactionChain implements TransactionChain {
-    private final Transaction trx;
+    protected final Transaction trx;
 
     public GenericTransactionChain(Transaction trx) {
         this.trx = trx;
@@ -23,19 +25,18 @@ public class GenericTransactionChain implements TransactionChain {
     }
 
     @Override
-    public TransactionChain apply(Consumer<DBConnection> c) {
-        trx.apply(c::accept);
+    public TransactionChain transact(Consumer<DatabaseSession> c) {
+        trx.apply(c);
         return this;
     }
 
     @Override
-    public <Q> TransactionChainDataHolder<Q> get(Function<DBConnection, Q> f) {
-        final Q ret = trx.ret(dbConnection -> f.apply(dbConnection));
-        return new GenereicTransactionChainDataHolder<Q>(trx, ret);
+    public <Q> TransactionChainData<Q> get(Function<DatabaseSession, Q> f) {
+        return new GenereicTransactionChainData<Q>(trx, trx.apply(f));
     }
 
     @Override
-    public TransactionChain callback(Runnable r) {
+    public TransactionChain process(Runnable r) {
         r.run();
         return this;
     }
