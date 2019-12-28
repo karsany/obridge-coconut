@@ -16,6 +16,7 @@
         <module>coconut-converter</module>
         <module>coconut-query</module>
     <module>coconut-incubator</module>
+  <module>coconut-data</module>
   </modules>
 
     <properties>

@@ -26,6 +26,16 @@
             <artifactId>coconut-json</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.obridge</groupId>
+            <artifactId>coconut-data</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.obridge</groupId>
+            <artifactId>coconut-query</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <!-- external -->
         <dependency>
@@ -33,6 +43,12 @@
             <artifactId>spark-core</artifactId>
             <version>2.9.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.oracle.ojdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>19.3.0.0</version>
+        </dependency>
+
 
         <!-- compile time -->
         <dependency>

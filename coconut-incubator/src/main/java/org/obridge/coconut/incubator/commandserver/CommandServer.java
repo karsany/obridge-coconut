@@ -22,25 +22,37 @@ public class CommandServer<T extends Command & JsonString> implements CommandBus
 
     private final int port;
     private final NamingStrategy ns;
-    private final Map<String, CommandHandler<T>> handlers = new HashMap<>();
+    private final CommandBus<T> cb;
     private final Map<String, Class<T>> commands = new HashMap<>();
 
-    public CommandServer(int port, NamingStrategy ns) {
+    public CommandServer(int port, NamingStrategy ns, CommandBus<T> cb) {
         this.port = port;
         this.ns = ns;
+        this.cb = cb;
         Spark.port(this.port);
 
     }
 
-    public CommandServer(int port) {
+    public CommandServer(int port, CommandBus<T> cb) {
         this.port = port;
         this.ns = commandHandler -> "/" + commandHandler.getSimpleName().toLowerCase();
+        this.cb = cb;
         Spark.port(this.port);
 
     }
 
     public void run() {
         Spark.get("/alive", (request, response) -> "OK");
+    }
+
+    public void printUrls() {
+        System.out.println("-----------------------------------------------");
+        for (Map.Entry<String, Class<T>> stringClassEntry : commands.entrySet()) {
+            System.out.println(stringClassEntry.getKey() + " --> " + stringClassEntry.getValue().getName());
+        }
+
+
+        System.out.println("-----------------------------------------------");
     }
 
     @Override
@@ -54,7 +66,7 @@ public class CommandServer<T extends Command & JsonString> implements CommandBus
         final Type[] actualTypeArguments = genericSuperclass.getActualTypeArguments();
         final Class actualTypeArgument = (Class) actualTypeArguments[0];
 
-        handlers.put(route, ch);
+        cb.registerHandler(ch);
         commands.put(route, actualTypeArgument);
         Spark.post(route, (request, response) -> this.handle(route, request, response));
         log.info("Registetred: " + actualTypeArgument.getCanonicalName() + " to url " + route + " (POST)");
@@ -66,9 +78,8 @@ public class CommandServer<T extends Command & JsonString> implements CommandBus
         System.out.println(request.body());
 
         try {
-            final CommandHandler<T> commandHandler = this.handlers.get(route);
-
-            final CommandResult<T> cr = commandHandler.handle(JsonObject.create(aClass, request.body()));
+            final T command = JsonObject.create(aClass, request.body());
+            final CommandResult<T> cr = this.handle(command);
 
             if (cr.result()) {
                 response.status(200);
@@ -87,8 +98,8 @@ public class CommandServer<T extends Command & JsonString> implements CommandBus
     }
 
     @Override
-    public CommandResult handle(Command command) {
-        throw new UnsupportedOperationException();
+    public CommandResult handle(T command) {
+        return cb.handle(command);
     }
 
 }
